@@ -1,0 +1,102 @@
+<dashboard version="1.1" theme="dark">
+  <label>Softmania Github Monitoring Dashboard</label>
+  <description>This is a first version of dashboard</description>
+  <row>
+    <panel>
+      <title>Total Actions by Repository</title>
+      <chart>
+        <title>Total Actions by Repository</title>
+        <search>
+          <query>index=softmania_github_monitoring_idx 
+| rename repository.name as repository_name repository.id as repository_id action as action repository.forks_count as repository_forks_count sender.login as sender_login sender.type as sender_type pull_request.base.repo.name as pull_request_repo_name pusher.name as pusher_name |table  _time repository_name repository_id action repository_forks_count sender_login sender_type pull_request_repo_name pusher_name 
+| stats count(action) as total_actions by repository_name | sort -total_actions</query>
+          <earliest>0</earliest>
+          <latest></latest>
+          <sampleRatio>1</sampleRatio>
+        </search>
+        <option name="charting.axisLabelsX.majorLabelStyle.overflowMode">ellipsisNone</option>
+        <option name="charting.axisLabelsX.majorLabelStyle.rotation">0</option>
+        <option name="charting.axisTitleX.visibility">visible</option>
+        <option name="charting.axisTitleY.visibility">visible</option>
+        <option name="charting.axisTitleY2.visibility">visible</option>
+        <option name="charting.axisX.abbreviation">none</option>
+        <option name="charting.axisX.scale">linear</option>
+        <option name="charting.axisY.abbreviation">none</option>
+        <option name="charting.axisY.scale">linear</option>
+        <option name="charting.axisY2.abbreviation">none</option>
+        <option name="charting.axisY2.enabled">0</option>
+        <option name="charting.axisY2.scale">inherit</option>
+        <option name="charting.chart">bar</option>
+        <option name="charting.chart.bubbleMaximumSize">50</option>
+        <option name="charting.chart.bubbleMinimumSize">10</option>
+        <option name="charting.chart.bubbleSizeBy">area</option>
+        <option name="charting.chart.nullValueMode">gaps</option>
+        <option name="charting.chart.showDataLabels">none</option>
+        <option name="charting.chart.sliceCollapsingThreshold">0.01</option>
+        <option name="charting.chart.stackMode">default</option>
+        <option name="charting.chart.style">shiny</option>
+        <option name="charting.drilldown">none</option>
+        <option name="charting.layout.splitSeries">0</option>
+        <option name="charting.layout.splitSeries.allowIndependentYRanges">0</option>
+        <option name="charting.legend.labelStyle.overflowMode">ellipsisMiddle</option>
+        <option name="charting.legend.mode">standard</option>
+        <option name="charting.legend.placement">right</option>
+        <option name="charting.lineWidth">2</option>
+        <option name="refresh.display">progressbar</option>
+        <option name="trellis.enabled">0</option>
+        <option name="trellis.scales.shared">1</option>
+        <option name="trellis.size">medium</option>
+      </chart>
+    </panel>
+    <panel>
+      <title>Repository activity over time</title>
+      <chart>
+        <title>Repository activity over time</title>
+        <search>
+          <query>index=softmania_github_monitoring_idx 
+| rename repository.name as repository_name repository.id as repository_id action as action repository.forks_count as repository_forks_count sender.login as sender_login sender.type as sender_type pull_request.base.repo.name as pull_request_repo_name pusher.name as pusher_name |table  _time repository_name repository_id action repository_forks_count sender_login sender_type pull_request_repo_name pusher_name 
+| timechart span=7d count by repository_name</query>
+          <earliest>0</earliest>
+          <latest></latest>
+        </search>
+        <option name="charting.chart">column</option>
+        <option name="charting.drilldown">none</option>
+      </chart>
+    </panel>
+  </row>
+  <row>
+    <panel>
+      <title>Top Contributor by commits</title>
+      <chart>
+        <title>Top Contributor by commits</title>
+        <search>
+          <query>index=softmania_github_monitoring_idx 
+| rename repository.name as repository_name repository.id as repository_id action as action repository.forks_count as repository_forks_count sender.login as sender_login sender.type as sender_type pull_request.base.repo.name as pull_request_repo_name pusher.name as pusher_name |table  _time repository_name repository_id action repository_forks_count sender_login sender_type pull_request_repo_name pusher_name 
+| stats count by sender_login | sort - count | rename count as total_commits</query>
+          <earliest>0</earliest>
+          <latest></latest>
+        </search>
+        <option name="charting.chart">pie</option>
+        <option name="charting.drilldown">none</option>
+      </chart>
+    </panel>
+  </row>
+  <row>
+    <panel>
+      <title>Repository Action Summary</title>
+      <table>
+        <title>Repository Action Summary</title>
+        <search>
+          <query>index=softmania_github_monitoring_idx 
+| rename repository.name as repository_name repository.id as repository_id action as action repository.forks_count as repository_forks_count sender.login as sender_login sender.type as sender_type pull_request.base.repo.name as pull_request_repo_name pusher.name as pusher_name 
+|table  _time repository_name repository_id action repository_forks_count sender_login sender_type pull_request_repo_name pusher_name 
+| stats count(action) as total_actions latest(_time) as last_action_time  latest(repository_forks_count) as forks_count by repository_name 
+| eval last_action_time = strftime(last_action_time, "%Y-%m-%d %H:%M:%S")</query>
+          <earliest>0</earliest>
+          <latest></latest>
+        </search>
+        <option name="drilldown">none</option>
+      </table>
+    </panel>
+  </row>
+</dashboard>
